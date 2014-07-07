@@ -51,3 +51,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#swapfiles
+*.swp
+
+#Virtualenv
+bin/
+include/
