@@ -5,6 +5,7 @@ import json
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import Response
 import pymongo
 
 app = Flask(__name__)
@@ -13,6 +14,10 @@ app.config["SECRET_KEY"] = "KeepThisS3cr3t"
 
 @app.route('/')
 def root():
+    return render_template('map.html')    
+
+@app.route('/<key>/')
+def find_person(key):
     return render_template('map.html')    
 
 @app.route('/locate/<key>/', methods = ['GET', 'POST'])
@@ -34,7 +39,10 @@ def update_session(session_key, request):
         r['lng'] = lng
         print r
         collection.update({'_id': r['_id']}, r)
-        return json.dumps(json_serialize(r))
+        return Response(json.dumps(json_serialize(r)),
+                        status=200,
+                        mimetype='application/json'
+                        )
 
 
 #finds the appropriate session and returns the latest location
@@ -42,8 +50,12 @@ def get_info_from_session(session_key):
     collection = get_db_connection()
     r = collection.find_one({'key': session_key})
     if r:
-        return json.dumps(json_serialize(r))
+        return Response(json.dumps(json_serialize(r)),
+                        status=200,
+                        mimetype='application/json'
+                        )
 
+    
 @app.route('/locate/', methods=['POST'])
 def create_new_session():
     key = gen_session_key()
@@ -51,12 +63,16 @@ def create_new_session():
     #should p much never happen
     while collection.find_one({"key": key}):
         key = gen_session_key()
+    print request.get_json()
     lat = request.get_json()['lat']
     lng = request.get_json()['lng']
     db_obj = {'key': key, 'lat': lat, 'lng': lng}
     collection.insert(db_obj)
     db_obj.pop('_id')
-    return json.dumps(json_serialize(r))
+    return Response(json.dumps(json_serialize(r)),
+                    status=200,
+                    mimetype='application/json'
+                    )
     
 
 

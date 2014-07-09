@@ -1,3 +1,4 @@
+var GET_INFO_PATH = '/locate/'
 function init(){
   var mapOptions = {
       zoom: 8,
@@ -10,6 +11,25 @@ function init(){
     map.setCenter(position.getPosition());
   });
 }
+
+function updateLocation(){
+  var key = window.location.pathname.split('/');
+  if(key[key.length-1] == ''){
+    key = key[key.length-2];
+  }
+  else {
+    key = key[key.length-1];
+  }
+  $.ajax({
+    url: GET_INFO_PATH + key + '/'
+  }).complete(function(d){
+    var lat = d.responseJSON.lat;
+    var lng = d.responseJSON.lng;
+    console.log(lat);
+    console.log(lng);
+  });
+}
+
 
 google.maps.event.addDomListener(window, 'load', init);
 
