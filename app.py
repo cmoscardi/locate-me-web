@@ -82,7 +82,7 @@ def gen_session_key():
     return ''.join(random.choice(possible_vals) for i in range(16))
 
 def get_db_connection():
-    return pymongo.MongoClient('localhost', 27017)['locate-me']['sessions']
+    return pymongo.MongoClient('mongodb://<dbuser>:<dbpassword>@ds027419.mongolab.com:27419/heroku_app27530590')['locate-me']['sessions']
 
 def json_serialize(obj):
     key = obj['key']
