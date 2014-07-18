@@ -1,6 +1,7 @@
 import random
 import string
 import json
+from urlparse import urlparse
 
 from flask import Flask
 from flask import render_template
@@ -61,15 +62,13 @@ def create_new_session():
     key = gen_session_key()
     collection = get_db_connection()
     #should p much never happen
-    while collection.find_one({"key": key}):
-        key = gen_session_key()
     print request.get_json()
     lat = request.get_json()['lat']
     lng = request.get_json()['lng']
     db_obj = {'key': key, 'lat': lat, 'lng': lng}
     collection.insert(db_obj)
     db_obj.pop('_id')
-    return Response(json.dumps(json_serialize(r)),
+    return Response(json.dumps(json_serialize(db_obj)),
                     status=200,
                     mimetype='application/json'
                     )
@@ -82,7 +81,7 @@ def gen_session_key():
     return ''.join(random.choice(possible_vals) for i in range(16))
 
 def get_db_connection():
-    return pymongo.MongoClient('mongodb://<dbuser>:<dbpassword>@ds027419.mongolab.com:27419/heroku_app27530590')['locate-me']['sessions']
+    return pymongo.MongoClient('mongodb://friend:hellofriend@ds027419.mongolab.com:27419/heroku_app27530590')[urlparse("mongodb://friend:hellofriend@ds027419.mongolab.com:27419/heroku_app27530590").path[1:]]['sessions']
 
 def json_serialize(obj):
     key = obj['key']
@@ -91,4 +90,4 @@ def json_serialize(obj):
     return {'key': key, 'lat': lat, 'lng': lng}
 
 if __name__ == '__main__' :
-    app.run()
+    app.run(debug=True)

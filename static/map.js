@@ -1,15 +1,21 @@
 var GET_INFO_PATH = '/locate/'
+var map = null;
+var position = null;
+
 function init(){
   var mapOptions = {
       zoom: 8,
     };
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'),
+  map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
-  var position = new GeolocationMarker(map);
+  position = new GeolocationMarker(map);
   position.addListener('position_changed', function() {
     map.setCenter(position.getPosition());
   });
+  if(!window.location.pathname == "/"){
+    updateLocation();
+  }
 }
 
 function updateLocation(){
@@ -27,6 +33,11 @@ function updateLocation(){
     var lng = d.responseJSON.lng;
     console.log(lat);
     console.log(lng);
+    var p = new google.maps.LatLng(lat, lng);
+    var marker = new google.maps.Marker( {
+      position: p,
+      map: map
+    });
   });
 }
 
